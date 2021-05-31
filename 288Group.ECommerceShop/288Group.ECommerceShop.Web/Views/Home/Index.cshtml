@@ -1,0 +1,47 @@
+﻿@model IndexViewModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="text-center">
+        <h1 class="display-4">Welcome - @Model.Username</h1>
+    </div>
+
+    <div class="text-center" style="padding:7px">
+        <h2>Products</h2>
+        <table>
+            @foreach (var product in Model.Products.Products)
+            {
+                <tr>
+                    <th>@product.Id</th>
+                    <th>@product.Name</th>
+                    <th>@product.Price</th>
+                    <th>
+                        <input type="button" value="Add To Shopping Cart" onclick="location.href='@Url.Action("AddProductToCart", "Home")'" />
+                    </th>
+                </tr>
+            }
+        </table>
+    </div>
+</body>
+</html>
