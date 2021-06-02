@@ -9,5 +9,6 @@ namespace _288Group.ECommerceShop.Persistence.Database
         IQueryable<Product> GetProduct();
         IQueryable<UserProductBasket> GetShoppingCart();
         IQueryable<User> GetUser();
+        IQueryable<DiscountCode> GetDiscountCode();
     }
 }

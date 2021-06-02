@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "288Group.ECommerceShop.Pers
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "288Group.ECommerceShop.DTOs", "288Group.ECommerceShop.DTOs\288Group.ECommerceShop.DTOs.csproj", "{6F0A2E75-FCB1-4CFD-AF29-B4FF27455786}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "288Group.ECommerceShop.Persistance.Tests", "288Group.ECommerceShop.Persistance.Tests\288Group.ECommerceShop.Persistance.Tests.csproj", "{E7AB5585-3648-43C8-B992-D8A61678096D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "288Group.ECommerceShop.Persistance.Tests", "288Group.ECommerceShop.Persistance.Tests\288Group.ECommerceShop.Persistance.Tests.csproj", "{E7AB5585-3648-43C8-B992-D8A61678096D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,7 +12,8 @@ namespace _288Group.ECommerceShop.Persistance
         long? GetUserId(string username, string password);
         string GetUsername(long userId);
         CreateNewUserResponseDTO AddUser(string username, string password);
-        BasketDTO GetBasket(long userId, long? discountCodeId = null);
+        ProductsDTO GetUserBasket(long userId);
         long? AddProductToBasket(long userId, long productId);
+        string TotalCostOfBasket(long userId);
     }
 }

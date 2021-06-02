@@ -12,10 +12,11 @@ namespace _288Group.ECommerceShop.Persistance
         private readonly IProductRepository _productRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserBasketRepository _userBasketRepository;
+        private readonly IDiscountCodeRepository _discountCodeRepository;
 
-        public PersistanceService(IErrorLogRepository errorRepository, IProductRepository productRepository, IUserRepository userRepository, IUserBasketRepository userBasketRepository)
-            => (_errorRepository, _productRepository, _userRepository, _userBasketRepository)
-            = (errorRepository, productRepository, userRepository, userBasketRepository);
+        public PersistanceService(IErrorLogRepository errorRepository, IProductRepository productRepository, IUserRepository userRepository, IUserBasketRepository userBasketRepository, IDiscountCodeRepository discountCodeRepository)
+            => (_errorRepository, _productRepository, _userRepository, _userBasketRepository, _discountCodeRepository)
+            = (errorRepository, productRepository, userRepository, userBasketRepository, discountCodeRepository);
 
         /// <returns>The provided errorMessage parameter for output to UI</returns>
         public string LogError(string errorMessage, Exception ex = null)
@@ -31,10 +32,7 @@ namespace _288Group.ECommerceShop.Persistance
         }
 
         public ProductsDTO GetAllProducts()
-            => new ProductsDTO(_productRepository.Get().Select(x => new ProductDTO(x.Id, x.Name, x.Price)).ToArray()); // TODO: Add paging and get Top X (100?) per page.
-
-        public ProductsDTO GetProducts(long[] productIds)
-            => new ProductsDTO(_productRepository.Get().Select(x => new ProductDTO(x.Id, x.Name, x.Price)).Where(x => productIds.Any(y => y == x.Id)).ToArray());
+            => new ProductsDTO(_productRepository.Get().Select(x => new ProductDTO(x.Id, x.Name, x.Price)).ToArray());
 
         public long? GetUserId(string username, string password)
             => _userRepository.Get().Where(x => x.Username == username && x.Password == password).Single().Id;
@@ -53,16 +51,40 @@ namespace _288Group.ECommerceShop.Persistance
             return new CreateNewUserResponseDTO(true, $"New User {username} has been created successfully");
         }
 
-        public ProductsDTO GetUserBasket(long userId)
-            => GetProducts(_userBasketRepository.Get().Where(x => x.UserId == userId).Select(x => x.ProductId).ToArray());               
+        public BasketDTO GetBasket(long userId, long? discountCodeId = null)
+        {
+            // TODO: optimize this into a single db query with specification pattern.
+            // TODO: make this more testable by moving the user friendly string definitions up into Controllers.
+            long[] productIds = _userBasketRepository.Get().Where(x => x.UserId == userId).Select(x => x.ProductId).ToArray();
+            decimal totalCostOfBasket = _productRepository.Get().Where(x => productIds.Any(y => y == x.Id)).Sum(x => x.Price);
+            string totalBeforeDiscount = $"£{totalCostOfBasket}";
+            string discountValue = "nil";
+            string totalAfterDiscount = $"£{totalCostOfBasket}";
+
+            DiscountCode discount = null;
+            if (discountCodeId != null)
+            {
+                discount = _discountCodeRepository.Get().Where(x => x.Id == discountCodeId).Single();
+                decimal calcDiscountValue = (totalCostOfBasket / 100) * discount.DiscountPercentage;
+                discountValue = $"£{calcDiscountValue}";
+                totalAfterDiscount = $"£{totalCostOfBasket - calcDiscountValue}";
+            }
+
+            return new BasketDTO(
+                totalBeforeDiscount,
+                discount?.Code,
+                $"{discount?.DiscountPercentage}%",
+                discountValue,
+                totalAfterDiscount,
+                GetProducts(productIds)
+            );
+        }
+
+        public ProductsDTO GetProducts(long[] productIds)
+            => new ProductsDTO(_productRepository.Get().Where(x => productIds.Any(y => y == x.Id)).Select(x => new ProductDTO(x.Id, x.Name, x.Price)).ToArray());
 
         public long? AddProductToBasket(long userId, long productId)
-            => _userBasketRepository.Add(new UserProductBasket(userId, productId));
-
-        public string TotalCostOfBasket(long userId)
-        {
-            long[] productIds = _userBasketRepository.Get().Where(x => x.UserId == userId).Select(x => x.ProductId).ToArray();
-            return "£" + _productRepository.Get().Where(x => productIds.Any(y => y == x.Id)).Sum(x => x.Price).ToString();
-        }
+            => userId == 0 ? null : _userBasketRepository.Add(new UserProductBasket(userId, productId));
+                
     }
 }

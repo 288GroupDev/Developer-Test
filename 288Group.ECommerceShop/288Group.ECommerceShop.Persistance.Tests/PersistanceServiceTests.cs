@@ -11,7 +11,8 @@ namespace _288Group.ECommerceShop.Persistance.Tests
         private Mock<IErrorLogRepository> _errorRepo;
         private Mock<IProductRepository> _productRepo;
         private Mock<IUserRepository> _userRepo;
-        private Mock<IUserBasketRepository> _shoppingCartRepo;
+        private Mock<IUserBasketRepository> _basketRepo;
+        private Mock<IDiscountCodeRepository> _discountRepo;
         private IPersistanceService _subject;
 
         [SetUp]
@@ -20,8 +21,9 @@ namespace _288Group.ECommerceShop.Persistance.Tests
             _errorRepo = new Mock<IErrorLogRepository>();
             _productRepo = new Mock<IProductRepository>();
             _userRepo = new Mock<IUserRepository>();
-            _shoppingCartRepo = new Mock<IUserBasketRepository>();
-            _subject = new PersistanceService(_errorRepo.Object, _productRepo.Object, _userRepo.Object, _shoppingCartRepo.Object);
+            _basketRepo = new Mock<IUserBasketRepository>();
+            _discountRepo = new Mock<IDiscountCodeRepository>();
+            _subject = new PersistanceService(_errorRepo.Object, _productRepo.Object, _userRepo.Object, _basketRepo.Object, _discountRepo.Object);
         }
 
         [Test]
@@ -152,14 +154,14 @@ namespace _288Group.ECommerceShop.Persistance.Tests
         }
 
         [Test]
-        public void PersistanceService_GetShoppingCart_CallsShoppingCartRepositoryGet()
+        public void PersistanceService_GetBasket_CallsBasketRepositoryGet()
         {
             // Arrange
             bool hasBeenCalled = false;
-            _shoppingCartRepo.Setup(x => x.Get()).Callback(() => hasBeenCalled = true);
+            _basketRepo.Setup(x => x.Get()).Callback(() => hasBeenCalled = true);
 
             // Act
-            var response = _subject.GetUserBasket((long)12345);
+            var response = _subject.GetBasket((long)12345);
 
             // Assert
             Assert.IsTrue(hasBeenCalled);
@@ -170,7 +172,7 @@ namespace _288Group.ECommerceShop.Persistance.Tests
         {
             // Arrange
             bool hasBeenCalled = false;
-            _shoppingCartRepo.Setup(x => x.Add(It.IsAny<UserProductBasket>())).Callback(() => hasBeenCalled = true);
+            _basketRepo.Setup(x => x.Add(It.IsAny<UserProductBasket>())).Callback(() => hasBeenCalled = true);
 
             // Act
             var response = _subject.AddProductToBasket((long)12345, (long)12345);

@@ -26,7 +26,6 @@ namespace _288Group.ECommerceShop.Persistence.Database
             modelBuilder.Entity<User>().HasData(new User("Fred", "ABC") { Id = 1 });
             modelBuilder.Entity<User>().HasData(new User("James", "ABC") { Id = 2 });
 
-            // TODO: create a new ProductBrand table, add a BrandId column to Product and DiscountCode tables to allow Brand specific discounts to be created.
             modelBuilder.Entity<DiscountCode>().HasData(new DiscountCode("EverythingIsAwesome", 20) { Id = 1 }); 
         }
 
@@ -41,5 +40,8 @@ namespace _288Group.ECommerceShop.Persistence.Database
 
         public IQueryable<UserProductBasket> GetShoppingCart()
             => ShoppingCarts;
+
+        public IQueryable<DiscountCode> GetDiscountCode()
+            => DiscountCodes;        
     }
 }

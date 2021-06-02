@@ -25,23 +25,158 @@
 
     <div class="text-center">
         <h1 class="display-4">Welcome - @Model.Username</h1>
+        @if (!Model.UserLoggedIn)
+        {
+            <p>Please sign in to add products to your Basket</p>
+            <p>
+                <input type="submit" value="Fred" onclick="window.location='/Home?userId=1';" />
+                <input type="submit" value="James" onclick="window.location='/Home?userId=2';" />
+            </p>
+        }
+        else
+        {
+            <p>
+                <input type="submit" value="Logout" onclick="window.location='/Home';" />
+            </p>
+        }
     </div>
 
     <div class="text-center" style="padding:7px">
-        <h2>Products</h2>
-        <table>
-            @foreach (var product in Model.Products.Products)
-            {
+        <h2>Avalible Products</h2>
+        <table id="products">
+            <thead style="background-color:lightsalmon">
                 <tr>
-                    <th>@product.Id</th>
-                    <th>@product.Name</th>
-                    <th>@product.Price</th>
-                    <th>
-                        <input type="button" value="Add To Shopping Cart" onclick="location.href='@Url.Action("AddProductToCart", "Home")'" />
-                    </th>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    @if (Model.UserLoggedIn)
+                    {
+                        <th>Select</th>
+                    }
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (var product in Model.Products.Products)
+                {
+                    <tr>
+                        <th>@product.Id</th>
+                        <th>@product.Name</th>
+                        <th>@product.Price</th>
+
+                        @if (Model.UserLoggedIn)
+                        {
+                            <th>
+                                <input type="checkbox" name="@product.Id" />
+                            </th>
+                        }
+                    </tr>
+                }
+            </tbody>
         </table>
+        @if (Model.UserLoggedIn)
+        {
+            <div>
+                <button id="btnProductsToBasket" onclick="AddProductsToBasket()">Add Selected Products To Basket</button>
+            </div>
+        }
     </div>
+
+    @if (Model.UserLoggedIn)
+    {
+        <div class="text-center" style="padding:7px">
+            <h2>Basket</h2>
+            <table id="basket">
+                <thead style="background-color:lightsalmon">
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <input id="txtDiscountCode" type="text" value="Discount Code" /> @* dropbox listing all discount codes *@
+            <button id="btnAppyDiscountCode" onclick="">Apply Discount Code</button> @* button to trigger ajax request to refresh Basket with disount code applied *@
+
+            @*TODO: display total sum of all product prices in basket from RefreshBasket() response *@
+            @*TODO: display discount code percentage from RefreshBasket() response *@
+            @*TODO: display total discount code value from RefreshBasket() response *@
+            @*TODO: display sum of all product prices minus discount from RefreshBasket() response *@
+
+        </div>
+    }
+
 </body>
 </html>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        RefreshBasket();
+    }, false);
+
+    function AddProductsToBasket() {
+        var selected = [];
+        $('#products input:checked').each(function () {
+            selected.push($(this).attr('name'));
+        });
+        var data = {
+            UserId: @Model.UserId,
+            ProductIds: selected
+        };
+        $.ajax({
+            url: '/Controller/AddProductsToBasket',
+            type: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data),
+            success: function (response) {
+                alert(response);
+            }
+        });
+    }
+
+    function RefreshBasket() {
+        var data = {
+            UserId: @Model.UserId
+        };
+        $.ajax({
+            url: '/Controller/GetBasket',
+            type: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data),
+            success: function (response) {
+                if (response.ErrorOccured) {
+                    alert(response.ErrorMessage);
+                }
+                else {
+
+
+
+                    // TODO: dynamically replace all table rows in basket with response.PayLoad.Products and update total basket prices and discount
+
+                    for (var i = 0; i < response.Payload.Products.Products; i++) {
+                        $('#basketContents')
+
+                        var tbodyRef = document.getElementById('basket').getElementsByTagName('tbody')[0];
+                        var newRow = tbodyRef.insertRow();
+
+                        var newCell = newRow.insertCell();
+
+                        var newText = document.createTextNode('new row');
+                        newCell.appendChild(newText);
+
+
+
+                    }
+
+                }
+            }
+        });
+    }
+</script>

@@ -25,7 +25,8 @@ namespace _288Group.ECommerceShop.Web
             services.AddScoped<IPersistanceService, PersistanceService>();            
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserBasketRepository, ShoppingCartRepository>();            
+            services.AddScoped<IUserBasketRepository, ShoppingCartRepository>();
+            services.AddScoped<IDiscountCodeRepository, DiscountCodeRepository>();            
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
